@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <script src="./index.js"></script>
+
+    <main style="position: relative; height: 100vh">
+        <div id="galaxy-container">
+        </div>
+    </main>
+
+
+    <script>
+        const galaxyContainer = document.querySelector('#galaxy-container');
+        const galaxy = new Galaxy(galaxyContainer, 75);
+        galaxy.generate();
+    </script>
+</body>
+</html>
