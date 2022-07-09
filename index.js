@@ -71,13 +71,11 @@ function randomG(v = 2){
 class Galaxy {
     constructor(container, starLimit) {
         this.container = container;
-        this.container.onmousemove = (e) => {
-            mousePos = new Vector(e.clientX, e.clientY);
-        }
         this.sun = {
             pos: new Vector(container.clientWidth / 2, container.scrollHeight / 2),
             mass: 20000000000,
         }
+        this._bindEvents();
         this.stars = (new Array(starLimit))
             .fill(undefined)
             .map(() => {
@@ -92,6 +90,30 @@ class Galaxy {
     generate(){
         this.container.append(this._createSun(), ...this.stars.map(s => s.createElement()))
         this.stars.forEach(s => s.animate());
+    }
+
+    _bindEvents(){
+        this.container.addEventListener("mousedown", (e) => {
+            this.canMoveStars = true;
+        });
+
+        this.container.addEventListener("mouseup", (e) => {
+            this.canMoveStars = false;
+            mousePos = undefined;
+        });
+
+        this.container.onmousemove = (e) => {
+            if(!this.canMoveStars) return;
+            mousePos = new Vector(e.clientX, e.clientY);
+        }
+
+        this.container.addEventListener("touchmove", (e) => {
+            mousePos = new Vector(e.touches[0].clientX, e.touches[0].clientY);
+        });
+
+        this.container.addEventListener('touchend', () => {
+            mousePos = undefined;
+        });
     }
 
     _createSun(){
@@ -181,9 +203,9 @@ class Star {
         let att = this._attractionForceToElement(this.sun.pos, this.sun.mass)
         const forces = [force.setMag(att)];
 
-        if(false && mousePos !== undefined){
+        if(mousePos !== undefined){
             let forceM = mousePos.sub(this.pos);
-            let attM = this._attractionForceToElement(mousePos, 20000000000)
+            let attM = this._attractionForceToElement(mousePos, 100000000000)
             forces.push(forceM.setMag(attM));
         }
         this.vel.x += forces.reduce((acc, f) => acc + f.x, 0) / this.mass
